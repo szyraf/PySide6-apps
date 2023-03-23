@@ -1,10 +1,8 @@
 import sys
 
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QTextEdit, QColorDialog, QFontDialog
-from PySide6.QtGui import QAction, QKeySequence, QFont, QColor
-
-# TODO: tworzenie nowego pliku, zapisywanie pliku, otwieranie istniejącego pliku
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QTextEdit, QColorDialog, QFontDialog, QFileDialog
+from PySide6.QtGui import QAction, QKeySequence, QFont, QColor, QTextDocumentWriter
 
 font = QFont('Roboto', 24)
 color = QColor(0, 0, 0)
@@ -153,10 +151,16 @@ class MainWindow(QMainWindow):
                 self.textBox.setFontItalic(False)
                 self.textBox.setFontUnderline(False)
             elif buttontext == "&Open":
-                print("open")
+                filename, _ = QFileDialog.getOpenFileName(self, 'Open File', '', 'HTML Files (*.html)')
+                if filename:
+                    with open(filename, 'r') as f:
+                        html = f.read()
+                    self.textBox.setHtml(html)
             elif buttontext == "&Save":
-                print("save")
-                # create file and save text with all formating
+                filename, _ = QFileDialog.getSaveFileName(self, 'Save File', '', 'HTML Files (*.html)')
+                if filename:
+                    writer = QTextDocumentWriter(filename)
+                    writer.write(self.textBox.document())
             elif buttontext == "&Bold":
                 self.textBox.setFontWeight(QFont.Bold if self.textBox.fontWeight() == QFont.Normal else QFont.Normal)
             elif buttontext == "&Italics":
