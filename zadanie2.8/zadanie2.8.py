@@ -1,23 +1,21 @@
 import sys
 
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLineEdit, QTextEdit, QColorDialog, \
-    QFontDialog
-from PySide6.QtGui import QAction, QKeySequence, QTextCharFormat, QFont, QColor
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QTextEdit, QColorDialog, QFontDialog
+from PySide6.QtGui import QAction, QKeySequence, QFont, QColor
 
 # TODO: tworzenie nowego pliku, zapisywanie pliku, otwieranie istniejącego pliku
-# TODO: formatowanie tekstu (pogrubienie, pochylenie, podkreślenie czcionki)
-# TODO: wyrównywanie tekstu (do lewej, do środka, do prawej, justowanie)
-# TODO: zmiana koloru i kroju czcionki.
 
 font = QFont('Roboto', 24)
 color = QColor(0, 0, 0)
 
 class ColorFormatingWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, this):
         super().__init__()
         self.setWindowTitle('Color Formating')
         self.resize(QSize(550, 350))
+
+        self.this = this
 
         finallayout = QVBoxLayout()
 
@@ -34,13 +32,16 @@ class ColorFormatingWindow(QMainWindow):
     def colorChanged(self):
         global color
         color = self.colorPicker.selectedColor()
+        self.this.textBox.setTextColor(color)
         self.close()
 
 class FontFormatingWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, this):
         super().__init__()
         self.setWindowTitle('Font Formating')
         self.resize(QSize(550, 350))
+
+        self.this = this
 
         finallayout = QVBoxLayout()
 
@@ -57,6 +58,7 @@ class FontFormatingWindow(QMainWindow):
     def fontChanged(self):
         global font
         font = self.fontPicker.selectedFont()
+        self.this.textBox.setFont(font)
         self.close()
 
 class MainWindow(QMainWindow):
@@ -139,18 +141,22 @@ class MainWindow(QMainWindow):
         widget.setLayout(finallayout)
         self.setCentralWidget(widget)
 
-        self.ColorFormatingWindow = ColorFormatingWindow()
-        self.FontFormatingWindow = FontFormatingWindow()
-
     def buttonClicked(self):
         try:
             buttontext = self.sender().text()
             if buttontext == "&New":
-                print("new")
+                self.textBox.clear()
+                self.textBox.setFont(QFont('Roboto', 24))
+                self.textBox.setTextColor(QColor(0, 0, 0))
+                self.textBox.setAlignment(Qt.AlignLeft)
+                self.textBox.setFontWeight(QFont.Normal)
+                self.textBox.setFontItalic(False)
+                self.textBox.setFontUnderline(False)
             elif buttontext == "&Open":
                 print("open")
             elif buttontext == "&Save":
                 print("save")
+                # create file and save text with all formating
             elif buttontext == "&Bold":
                 self.textBox.setFontWeight(QFont.Bold if self.textBox.fontWeight() == QFont.Normal else QFont.Normal)
             elif buttontext == "&Italics":
@@ -166,8 +172,10 @@ class MainWindow(QMainWindow):
             elif buttontext == "&Justify":
                 self.textBox.setAlignment(Qt.AlignJustify)
             elif buttontext == "&Color":
+                self.ColorFormatingWindow = ColorFormatingWindow(self)
                 self.ColorFormatingWindow.show()
             elif buttontext == "&Font":
+                self.FontFormatingWindow = FontFormatingWindow(self)
                 self.FontFormatingWindow.show()
             else:
                 print("error")
