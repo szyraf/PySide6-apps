@@ -171,7 +171,17 @@ class Canvas(QtWidgets.QLabel):
             painter.setPen(pen)
             if self.start_x is not None and self.start_y is not None:
                 if whichTool == 2:
-                    painter.drawLine(self.start_x, self.start_y, mousePosition.x(), mousePosition.y())
+                    if e.modifiers() & QtCore.Qt.ShiftModifier:
+                        if (abs(mousePosition.x() - self.start_x)) > (abs(mousePosition.y() - self.start_y)):
+                            x = mousePosition.x()
+                            y = self.start_y
+                            painter.drawLine(self.start_x, self.start_y, x, y)
+                        else:
+                            x = self.start_x
+                            y = mousePosition.y()
+                            painter.drawLine(self.start_x, self.start_y, x, y)
+                    else:
+                        painter.drawLine(self.start_x, self.start_y, mousePosition.x(), mousePosition.y())
                 elif whichTool == 3:
                     if brushColor == 0:
                         painter.setBrush(QtGui.QBrush(primaryColor))
